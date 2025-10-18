@@ -82,14 +82,17 @@ public class WombaClient {
         }
     }
 
-    public static class GenerateResponse {
-        public String story_key;
+    public static class TestPlan {
+        public Map<String, Object> story;
         public List<TestCase> test_cases;
-        public double quality_score;
-        public String suggested_folder;
-        public double execution_time_seconds;
-        public List<String> zephyr_ids;
         public Map<String, Object> metadata;
+        public String summary;
+        public String coverage_analysis;
+    }
+
+    public static class GenerateResponse {
+        public TestPlan test_plan;
+        public Map<String, Object> zephyr_results;
     }
 
     public static class TestCase {

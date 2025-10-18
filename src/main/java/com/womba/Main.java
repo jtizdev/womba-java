@@ -78,14 +78,25 @@ public class Main {
         WombaClient.GenerateResponse result = client.generateTests(storyKey, upload);
 
         // Print results
-        System.out.println(ansi().fgGreen().a("✅ Successfully generated " + result.test_cases.size() + " test cases!").reset());
-        System.out.println(ansi().fgCyan().a(String.format("📊 Quality Score: %.1f/100", result.quality_score)).reset());
-        System.out.println(ansi().fgCyan().a("📁 Suggested Folder: " + result.suggested_folder).reset());
-        System.out.println(ansi().fgCyan().a(String.format("⏱️  Execution Time: %.2fs", result.execution_time_seconds)).reset());
-
-        if (result.metadata != null) {
-            if (result.metadata.containsKey("ai_model")) {
-                System.out.println(ansi().fgCyan().a("🤖 AI Model: " + result.metadata.get("ai_model")).reset());
+        String storyKeyResult = result.test_plan.story != null ? String.valueOf(result.test_plan.story.get("key")) : "N/A";
+        System.out.println(ansi().fgGreen().a("✅ Successfully generated " + result.test_plan.test_cases.size() + " test cases for " + storyKeyResult + "!").reset());
+        
+        if (result.test_plan.metadata != null) {
+            if (result.test_plan.metadata.containsKey("quality_score")) {
+                System.out.println(ansi().fgCyan().a(String.format("📊 Quality Score: %.1f/100", ((Number) result.test_plan.metadata.get("quality_score")).doubleValue())).reset());
+            }
+            if (result.test_plan.metadata.containsKey("suggested_folder")) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> folder = (Map<String, Object>) result.test_plan.metadata.get("suggested_folder");
+                if (folder != null && folder.containsKey("name")) {
+                    System.out.println(ansi().fgCyan().a("📁 Suggested Folder: " + folder.get("name")).reset());
+                }
+            }
+            if (result.test_plan.metadata.containsKey("execution_time_seconds")) {
+                System.out.println(ansi().fgCyan().a(String.format("⏱️  Execution Time: %.2fs", ((Number) result.test_plan.metadata.get("execution_time_seconds")).doubleValue())).reset());
+            }
+            if (result.test_plan.metadata.containsKey("ai_model")) {
+                System.out.println(ansi().fgCyan().a("🤖 AI Model: " + result.test_plan.metadata.get("ai_model")).reset());
             }
         }
 
@@ -94,8 +105,8 @@ public class Main {
         System.out.println(ansi().fgYellow().a("Generated Test Cases:").reset());
         System.out.println(ansi().fgYellow().a("=".repeat(80)).reset());
 
-        for (int i = 0; i < result.test_cases.size(); i++) {
-            WombaClient.TestCase testCase = result.test_cases.get(i);
+        for (int i = 0; i < result.test_plan.test_cases.size(); i++) {
+            WombaClient.TestCase testCase = result.test_plan.test_cases.get(i);
             System.out.println();
             System.out.println(ansi().fgCyan().a(String.format("%d. %s", i + 1, testCase.title)).reset());
             System.out.println("   Priority: " + testCase.priority + " | Type: " + testCase.test_type);
@@ -104,11 +115,15 @@ public class Main {
         }
 
         // Print Zephyr IDs if uploaded
-        if (upload && result.zephyr_ids != null && !result.zephyr_ids.isEmpty()) {
+        if (upload && result.zephyr_results != null && result.zephyr_results.containsKey("zephyr_ids")) {
             System.out.println();
             System.out.println(ansi().fgGreen().a("✅ Uploaded to Zephyr:").reset());
-            for (int i = 0; i < result.zephyr_ids.size(); i++) {
-                System.out.println("   " + (i + 1) + ". " + result.zephyr_ids.get(i));
+            @SuppressWarnings("unchecked")
+            List<String> zephyrIds = (List<String>) result.zephyr_results.get("zephyr_ids");
+            if (zephyrIds != null) {
+                for (int i = 0; i < zephyrIds.size(); i++) {
+                    System.out.println("   " + (i + 1) + ". " + zephyrIds.get(i));
+                }
             }
         }
 
