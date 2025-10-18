@@ -39,7 +39,7 @@ public class WombaClient {
         String jsonBody = gson.toJson(request);
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/v1/generate"))
+                .uri(URI.create(baseUrl + "/api/v1/test-plans/generate"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
                 .timeout(Duration.ofSeconds(120))
