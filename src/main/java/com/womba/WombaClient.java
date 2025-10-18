@@ -73,11 +73,11 @@ public class WombaClient {
 
     // Request/Response models
     public static class GenerateRequest {
-        private final String story_key;
+        private final String issue_key;
         private final boolean upload_to_zephyr;
 
         public GenerateRequest(String storyKey, boolean uploadToZephyr) {
-            this.story_key = storyKey;
+            this.issue_key = storyKey;
             this.upload_to_zephyr = uploadToZephyr;
         }
     }
